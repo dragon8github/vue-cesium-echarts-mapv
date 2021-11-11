@@ -12,6 +12,14 @@ import 'cesium/Widgets/widgets.css'
 // 加入到全局，方便调试和使用
 Vue.prototype.Cesium = window.Cesium = Cesium
 
+// 导入 mapv
+// 1、由于 mapv.cesiumMapLayer 依赖全局环境的 Cesium 变量，所以上面一步需要先装载到全局
+// 2、不可以使用 import 导入 mapv，必须使用 require。原因是我必须等待上一句 cesium 装载到全局才可以。如果是 import 会自动提升到代码顶部执行。
+const mapv = require('mapv')
+
+// 加入到全局，方便调试和使用
+Vue.prototype.mapv = window.mapv = mapv
+
 // 打印资料，方便调试
 window.getInfo = (_viewer) => {
     const viewer = _viewer || window.viewer
