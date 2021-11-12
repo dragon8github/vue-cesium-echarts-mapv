@@ -4,21 +4,34 @@
 
 <script>
 import * as Cesium from 'cesium/Cesium'
-import EchartsLayer from '@/cesium/EchartsLayer'
+import EchartsLayer from '@/cesium/EchartsLayer_v1'
 
 export default {
 	mounted() {
 		Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0NjMxNmYzZS0yMjU1LTQ3MWQtYTQ0MS01N2UzY2NhOGE0MTUiLCJpZCI6MTU5MzAsImlhdCI6MTYxOTEzOTU0NH0.lbeW8qc9XX_ln5uSo6yWfVTEDgsCThwRd4cWX4QNdus'
 
 		const viewer = (window.viewer = new Cesium.Viewer('cesiumContainer', {
-			terrainProvider: Cesium.createWorldTerrain(),
+			infoBox: false,
+            selectionIndicator: false,
+            navigation: false,
+            animation: false,
+            timeline: false,
+            baseLayerPicker: false,
+            geocoder: false,
+            homeButton: false,
+            sceneModePicker: false,
+            navigationHelpButton: false,
+            shouldAnimate: true,
+            imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+                url: 'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer'
+            })
 		}))
 
 		// 渲染 echarts
-		// this.renderEcharts(viewer)
+		this.renderEcharts(viewer)
 
 		// 渲染 mapv 
-		this.renderMapv(viewer)
+		// this.renderMapv(viewer)
 	},
 	methods: {
 		// https://github.com/huiyan-fe/mapv/commit/c9e5a9824b2bd983bbe57bf083aef48781b4168c
@@ -54,10 +67,9 @@ export default {
 		// https://github.com/happyport/Cesium-Echarts4
 		renderEcharts(viewer) {
 			viewer.camera.setView({
-				destination: Cesium.Cartesian3.fromDegrees(103.86664976099877, 32.749108918373295, 1735650),
-				orientation: { heading: 1.5437545086535636, pitch: -1.1744530062585512, roll: 0.0011684443958133173 },
+				destination: Cesium.Cartesian3.fromDegrees(114.46654690269462, 22.05893520102907, 1739337 ),
+				orientation: { heading: 6.2725992867021105, pitch: -1.179484583028378, roll: 6.282598084227001 },
 			})
-
 
 			// 渲染 echarts（这里的 animation 和 GLMap 参数是必备的）
 			var echartsLayer = new EchartsLayer(viewer, {
@@ -82,6 +94,11 @@ export default {
 						data: [ { name: '北京', value: [116.4551, 40.2539, 100] }, { name: '上海', value: [121.4648, 31.2891, 30] }, { name: '广州', value: [113.5107, 23.2196, 20] }, { name: '大连', value: [122.2229, 39.4409, 10] }, { name: '青岛', value: [120.4651, 36.3373, 20] }, { name: '石家庄', value: [114.4995, 38.1006, 20] }, { name: '南昌', value: [116.0046, 28.6633, 10] }, { name: '合肥', value: [117.29, 32.0581, 30] }, { name: '呼和浩特', value: [111.4124, 40.4901, 10] }, { name: '宿州', value: [117.5535, 33.7775, 10] }, { name: '曲阜', value: [117.323, 35.8926, 10] }, { name: '杭州', value: [119.5313, 29.8773, 10] }, { name: '武汉', value: [114.3896, 30.6628, 10] }, { name: '深圳', value: [114.5435, 22.5439, 10] }, { name: '珠海', value: [113.7305, 22.1155, 10] }, { name: '福州', value: [119.4543, 25.9222, 20] }, { name: '西安', value: [109.1162, 34.2004, 60] }, { name: '赣州', value: [116.0046, 25.6633, 10] }, ],
 					},
 				],
+			})
+
+			// no work……
+			echartsLayer._chart.on('click', params => {
+				console.log(20180824012121, params)
 			})
 		},
 	},

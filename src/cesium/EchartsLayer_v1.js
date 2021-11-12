@@ -1,5 +1,6 @@
 import echarts from 'echarts'
 import GLMapCoordSys from './RegisterCoordinateSystem'
+import { mockClickChart } from './utils.js'
 
 var EchartsLayer = function (map, options) {
     this._map = map
@@ -13,31 +14,25 @@ var EchartsLayer = function (map, options) {
 EchartsLayer.prototype._registerMap = function () {
     if (!this._isRegistered) {
         echarts.registerCoordinateSystem('GLMap', GLMapCoordSys),
-            echarts.registerAction(
-                {
-                    type: 'GLMapRoam',
-                    event: 'GLMapRoam',
-                    update: 'updateLayout',
-                },
-                function (t, e) {}
-            ),
+            echarts.registerAction({ type: 'GLMapRoam', event: 'GLMapRoam', update: 'updateLayout' }, function (t, e) {}),
             echarts.extendComponentModel({
                 type: 'GLMap',
-                getBMap: function () {
+                getBMap() {
                     return this.__GLMap
                 },
                 defaultOption: { roam: !1 },
             }),
             echarts.extendComponentView({
                 type: 'GLMap',
-                init: function (t, e) {
-                    ;(this.api = e), echarts.glMap.postRender.addEventListener(this.moveHandler, this)
+                init(t, e) {
+                    this.api = e
+                    echarts.glMap.postRender.addEventListener(this.moveHandler, this)
                 },
-                moveHandler: function (t, e) {
+                moveHandler(t, e) {
                     this.api.dispatchAction({ type: 'GLMapRoam' })
                 },
-                render: function (t, e, i) {},
-                dispose: function (t) {
+                render(t, e, i) {},
+                dispose(t) {
                     echarts.glMap.postRender.removeEventListener(this.moveHandler, this)
                 },
             })
@@ -50,8 +45,24 @@ EchartsLayer.prototype._createChartOverlay = function () {
     var scene = this._map.scene
     scene.canvas.setAttribute('tabIndex', 0)
     const ele = document.createElement('div')
-    return (ele.style.position = 'absolute'), (ele.style.top = '0px'), (ele.style.left = '0px'), (ele.style.width = scene.canvas.width + 'px'), (ele.style.height = scene.canvas.height + 'px'), (ele.style.pointerEvents = 'none'), ele.setAttribute('id', 'echarts'), ele.setAttribute('class', 'echartMap'), this._map.container.appendChild(ele), (this._echartsContainer = ele), (echarts.glMap = scene), (this._chart = echarts.init(ele))
+    ele.style.position = 'absolute'
+    ele.style.top = '0px'
+    ele.style.left = '0px'
+    ele.style.width = scene.canvas.width + 'px'
+    ele.style.height = scene.canvas.height + 'px'
+    ele.style.pointerEvents = 'none'
+    ele.setAttribute('id', 'echarts')
+    ele.setAttribute('class', 'echartMap')
+    this._map.container.appendChild(ele)
+    this._echartsContainer = ele
+    echarts.glMap = scene
+    this._chart = echarts.init(ele)
     this.resize()
+
+    const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas)
+    handler.setInputAction(click => mockClickChart(event, this._chart), Cesium.ScreenSpaceEventType.LEFT_CLICK)
+
+    return this._chart
 }
 
 EchartsLayer.prototype.dispose = function () {
